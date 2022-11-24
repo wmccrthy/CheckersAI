@@ -18,7 +18,7 @@ cell_height = window_height/8
 BLACK = (0,0,0)
 RED = (250,0,0)
 
-font = pg.font.SysFont('chalkboardse', 20)
+font = pg.font.SysFont('chalkboardse', 15)
 bigFont = pg.font.SysFont('chalkboardse', 40)
 
 def play(): 
@@ -28,6 +28,8 @@ def play():
     menu = True
     oneP  = False
     twoP = False
+    zeroP = False 
+
     while menu:
         window.fill(BLACK)
         for event in pg.event.get():
@@ -35,6 +37,10 @@ def play():
                 pg.quit()
                 sys.exit()
             if event.type == pg.KEYDOWN:
+                if event.key == pg.K_0:
+                    zeroP = True
+                    oneP = True
+                    menu = False
                 if event.key == pg.K_1:
                     oneP = True
                     menu = False
@@ -43,7 +49,7 @@ def play():
                     menu = False
         
         header  = bigFont.render("Checkers", True, (250,250,250))
-        instruc  = font.render("Press 1 to play vs the AI. Press 2 to play two player. Press r to reset board", True, (250,250,250))
+        instruc  = font.render("Press 0 to watch the AI play. Press 1 to play vs the AI. Press 2 to play two player. Press r to reset board", True, (250,250,250))
         window.blit(header, (window_width/2-header.get_width()/2, window_height/2-header.get_height()/2-80))
         window.blit(instruc, (window_width/2-instruc.get_width()/2, window_height/2-header.get_height()/2))
         pg.display.flip()
@@ -53,112 +59,120 @@ def play():
     test = board.Board()
     selected = False
     run = True
-    window.fill((150,150,150))
-    while run:
-        clock.tick(60)
-        pg.display.flip()
-
-        test.resetCount()
-        test.updateKingCount()
-
-        if test.terminalTest():
-            window.fill((0,0,0))
-            if test.evalFunction() > 0:
-                print("GAME OVER | WINNER: RED | SCORE: " + str(test.evalFunction()))
-                res = "GAME OVER | WINNER: RED | SCORE: " + str(test.evalFunction())
-            else:
-                res = "GAME OVER | WINNER: BLACK | SCORE: " + str(test.evalFunction())
-                print("GAME OVER | WINNER: BLACK | SCORE: " + str(test.evalFunction()))
-            run = False
-
-        if oneP:
-            if test.turn == BLACK:
-                selected = False
-                new_board = minimax.minValue(test, 3, -99999, 99999, min_transposition, max_transposition)[1]
-                # new_board = minimax.EminValue(test, 3)[1]
-                # new_board = minimax.expectiValue(test, 3)[1]
-                test = new_board
-                test.turn = test.players.__next__()
-                print("Turn: " + str(test.turn))
-                print("SCORE: " + str(test.evalFunction()))
-        # else:
-        #     selected = False
-        #     new_board = minimax.EmaxValue(test, 3)[1]
-        #     test = new_board
-        #     test.turn = test.players.__next__()
-        #     print("Turn: " + str(test.turn))
-        #     print("SCORE: " + str(test.evalFunction()))
-
-
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                pg.quit()
-                sys.exit()
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_SPACE:
-                    param = pg.mouse.get_pos()
-                    c, r = test.mouseRC(param)
-                    if test.getPiece(c,r) == None:
-                        continue
-                    selected = True
-                if event.key == pg.K_r:
-                    test = board.Board()
-            if event.type == pg.MOUSEBUTTONDOWN and selected:
-                param = pg.mouse.get_pos()
-                mc, mr = test.mouseRC(param)
-                if test.getPiece(c,r) == None:
-                        continue
-                if (mc,mr) not in test.getPiece(c,r).getValidMoves(test.board):
-                    continue
-                if test.getPiece(c,r).player == test.turn:
-                    test.move(test.board[c][r], mc,mr, test.getPiece(c,r))
-                
-                    for pos in test.getDiagonals(c, r, mc, mr):
-                        x = pos[0]
-                        y = pos[1]
-                        if test.board[x][y].checker != None:
-                            if test.board[x][y].checker.player == BLACK:
-                                test.black_count -= 1
-                            if test.board[x][y].checker.player == RED:
-                                test.red_count -= 1
-                        test.removePiece(x, y)
-                    print("Black Pieces: " + str(test.black_count) + " Black Kings: " + str(test.black_kings))
-                    print("Red Pieces: " + str(test.red_count) + " Red Kings: " + str(test.red_kings))
-                    print("Score: " + str(test.evalFunction()))
-                    
-
-                    test.turn = test.players.__next__()
-                
-                    selected = False
-
-                # need to implement rule that skipped pieces are removed (done as of 11/20)
-                # need to implement king functionality (done as of 11/20)
-                #these are final steps before game is essentailly fully playabale; need to then implement system for winning / losing 
-                
-                # start thinking abt eval function, how to implement minimax 
-        
-        test.drawBoard(window)
-        if selected:
-            # if the piece selected is whose turn it is
-            if test.getPiece(c,r) != None and test.getPiece(c,r).player == test.turn: 
-                test.drawMoves(c, r)
-               
-    while not run:
+    window.fill((0,0,0))
+    old_board = None
+    while True:
         window.fill((0,0,0))
-        winner = font.render(res, True, (250,250,250))
-        rest = font.render("Press r to restart", True, (250,250,250))
-        window.blit(winner, (window_width/2-winner.get_width()/2, window_height/2-winner.get_height()/2))
-        window.blit(rest, (window_width/2-winner.get_width()/2, window_height/2-winner.get_height()/2+25))
+        while run:
+            clock.tick(60)
+            pg.display.flip()
 
-        pg.display.flip()
+            test.resetCount()
+            test.updateKingCount()
 
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                pg.quit()
-                sys.exit()
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_r:
-                    test = board.Board()
-                    run = True
-        
+            if test.terminalTest():
+                window.fill((0,0,0))
+                if test.evalFunction() > 0:
+                    print("GAME OVER | WINNER: RED | SCORE: " + str(test.evalFunction()))
+                    res = "GAME OVER | WINNER: RED | SCORE: " + str(test.evalFunction())
+                else:
+                    res = "GAME OVER | WINNER: BLACK | SCORE: " + str(test.evalFunction())
+                    print("GAME OVER | WINNER: BLACK | SCORE: " + str(test.evalFunction()))
+                run = False
+
+            # to debug minimax, have an input that allows you to undo a turn, will allow me to see precisely where
+            # and thus hopefully deduce why minimax might be going wrong; ok, definitely minimax that is bugging; question is
+            # WHY
+            # was in valid moves generation, indices were going out of bounds but it is now fixed 
+            # right now, valid moves is very unoptimal. unfortunate 
+            
+            if oneP:
+                if test.turn == BLACK:
+                    selected = False
+                    old_board = test
+                    new_board = minimax.minValue(test, 3, -99999, 99999, min_transposition, max_transposition)[1]
+                    # new_board = minimax.EminValue(test, 3)[1]
+                    test = new_board
+                    test.num_plys += 1
+                    print("Turn: " + str(test.turn))
+                    print("SCORE: " + str(test.evalFunction()))
+                    print("Plys Completed: " + str(test.num_plys))
+                else: 
+                    if zeroP:
+                        selected = False
+                        new_board = minimax.EmaxValue(test, 3)[1]
+                        test = new_board
+                        # test.turn = test.players.__next__()
+                        print("Turn: " + str(test.turn))
+                        print("SCORE: " + str(test.evalFunction()))
+
+
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_SPACE:
+                        param = pg.mouse.get_pos()
+                        c, r = test.mouseRC(param)
+                        if test.getPiece(c,r) == None:
+                            continue
+                        selected = True
+                    if event.key == pg.K_r:
+                        test = board.Board()
+                    if event.key == pg.K_BACKSPACE:
+                        test = old_board
+                        test.turn = test.players.__next__()
+                if event.type == pg.MOUSEBUTTONDOWN and selected:
+                    param = pg.mouse.get_pos()
+                    mc, mr = test.mouseRC(param)
+                    if test.getPiece(c,r) == None:
+                            continue
+                    if (mc,mr) not in test.getPiece(c,r).getValidMoves(test.board):
+                        continue
+                    if test.getPiece(c,r).player == test.turn:
+                        test.move(test.board[c][r], mc,mr, test.getPiece(c,r))
+                    
+                        for pos in test.getDiagonals(c,r, mc, mr):
+                            x = pos[0]
+                            y = pos[1]
+                            if test.board[x][y].checker != None:
+                                if test.board[x][y].checker.player == BLACK and test.turn == RED:
+                                    test.black_count -= 1
+                                if test.board[x][y].checker.player == RED and test.turn == BLACK:
+                                    test.red_count -= 1
+                                if test.getPiece(x,y).player != test.turn:
+                                    test.removePiece(x, y)
+                        print("Black Pieces: " + str(test.black_count) + " Black Kings: " + str(test.black_kings))
+                        print("Red Pieces: " + str(test.red_count) + " Red Kings: " + str(test.red_kings))
+                        print("Score: " + str(test.evalFunction()))
+
+                        test.turn = test.players.__next__()
+                    
+                        selected = False
+
+            test.drawBoard(window)
+            if selected:
+                # if the piece selected is whose turn it is
+                if test.getPiece(c,r) != None and test.getPiece(c,r).player == test.turn: 
+                    test.drawMoves(c, r)
+                
+        while not run:
+            # window.fill((0,0,0))
+            winner = font.render(res, True, (250,250,250), (0,0,0))
+            rest = font.render("Press r to restart", True, (250,250,250), (0,0,0))
+            window.blit(winner, (window_width/2-winner.get_width()/2, window_height/2-winner.get_height()/2))
+            window.blit(rest, (window_width/2-winner.get_width()/2, window_height/2-winner.get_height()/2+25))
+
+            pg.display.flip()
+
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_r:
+                        test = board.Board()
+                        run = True
+   
 play()

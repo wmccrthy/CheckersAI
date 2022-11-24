@@ -125,54 +125,58 @@ class CheckerPiece:
                 for i in range(1,rightrng):
                 # check for own color in diags
                     if self.y - i >= 0:
-                        if board[self.x+i][self.y-i].checker != None:
-                            if board[self.x+i][self.y-i].checker.player == self.player:
+                        if self.x+i <8:
+                            if board[self.x+i][self.y-i].checker != None:
+                                if board[self.x+i][self.y-i].checker.player == self.player:
+                                    break
+                            if board[self.x+i][self.y-i].checker == None:
+                                # if i == 2; meaning this move is a jump, check if can double jump
+                                if i == 2 and 0 <= self.x+i+2 < 8 and 0<= self.y-i+2 < 8:
+                                    if board[self.x+i+1][self.y-i-1].checker != None and board[self.x+i+1][self.y-i-1].checker.player  != self.player and board[self.x+i+2][self.y-i-2].checker == None:
+                                        moves.append((self.x+i+2, self.y-i-2))
+                                moves.append((self.x+i,self.y-i))
+                            
                                 break
-                        if board[self.x+i][self.y-i].checker == None:
-                            # if i == 2; meaning this move is a jump, check if can double jump
-                            if i == 2 and 0 <= self.x+i+2 < 8 and 0<= self.y-i+2 < 8:
-                                if board[self.x+i+1][self.y-i-1].checker != None and board[self.x+i+1][self.y-i-1].checker.player  != self.player and board[self.x+i+2][self.y-i-2].checker == None:
-                                    moves.append((self.x+i+2, self.y-i-2))
-                            moves.append((self.x+i,self.y-i))
-                        
-                            break
                
                 for i in range(1, leftrng):
                     if self.y - i >= 0:
-                        if board[self.x-i][self.y-i].checker != None:
-                            if board[self.x-i][self.y-i].checker.player == self.player:
+                        if self.x - i >= 0:
+                            if board[self.x-i][self.y-i].checker != None:
+                                if board[self.x-i][self.y-i].checker.player == self.player:
+                                    break
+                            if board[self.x-i][self.y-i].checker == None:
+                                if i == 2 and 0 <= self.x-i+2 < 8 and 0<= self.y-i+2 < 8:
+                                    if board[self.x-i-1][self.y-i-1].checker != None and board[self.x-i-1][self.y-i-1].checker.player  != self.player and board[self.x-i-2][self.y-i-2].checker == None:
+                                        moves.append((self.x-i-2, self.y-i-2))
+                                moves.append((self.x-i, self.y-i))
                                 break
-                        if board[self.x-i][self.y-i].checker == None:
-                            if i == 2 and 0 <= self.x-i+2 < 8 and 0<= self.y-i+2 < 8:
-                                if board[self.x-i-1][self.y-i-1].checker != None and board[self.x-i-1][self.y-i-1].checker.player  != self.player and board[self.x-i-2][self.y-i-2].checker == None:
-                                    moves.append((self.x-i-2, self.y-i-2))
-                            moves.append((self.x-i, self.y-i))
-                            break
                 
                 for i in range(1,rightrng):
                 # check for own color in diags
                 # print(self.x+i, self.y+i)
                     if self.y + i < 8:
-                        if board[self.x+i][self.y+i].checker != None:
-                            if board[self.x+i][self.y+i].checker.player == self.player:
+                        if self.x + i < 8: 
+                            if board[self.x+i][self.y+i].checker != None:
+                                if board[self.x+i][self.y+i].checker.player == self.player:
+                                    break
+                            if board[self.x+i][self.y+i].checker == None:
+                                if i == 2 and 0 <= self.x+i+2 < 8 and 0<= self.y+i+2 < 8:
+                                    if board[self.x+i+1][self.y+i+1].checker != None and board[self.x+i+1][self.y+i+1].checker.player  != self.player and board[self.x+i+2][self.y+i+2].checker == None:
+                                        moves.append((self.x+i+2, self.y+i+2))
+                                moves.append((self.x+i,self.y+i))
                                 break
-                        if board[self.x+i][self.y+i].checker == None:
-                            if i == 2 and 0 <= self.x+i+2 < 8 and 0<= self.y+i+2 < 8:
-                                if board[self.x+i+1][self.y+i+1].checker != None and board[self.x+i+1][self.y+i+1].checker.player  != self.player and board[self.x+i+2][self.y+i+2].checker == None:
-                                    moves.append((self.x+i+2, self.y+i+2))
-                            moves.append((self.x+i,self.y+i))
-                            break
                 for i in range(1, leftrng):
                     if self.y + i < 8:
-                        if board[self.x-i][self.y+i].checker != None:
-                            if board[self.x-i][self.y+i].checker.player == self.player:
+                        if self.x -i >= 0:
+                            if board[self.x-i][self.y+i].checker != None:
+                                if board[self.x-i][self.y+i].checker.player == self.player:
+                                    break
+                            if board[self.x-i][self.y+i].checker == None:
+                                if i == 2 and 0 <= self.x-i+2 < 8 and 0<= self.y+i+2 < 8:
+                                    if board[self.x-i-1][self.y+i+1].checker != None and board[self.x-i-1][self.y+i+1].checker.player  != self.player and board[self.x-i-2][self.y+i+2].checker == None:
+                                        moves.append((self.x-i-2, self.y+i+2))
+                                moves.append((self.x-i, self.y+i))
                                 break
-                        if board[self.x-i][self.y+i].checker == None:
-                            if i == 2 and 0 <= self.x-i+2 < 8 and 0<= self.y+i+2 < 8:
-                                if board[self.x-i-1][self.y+i+1].checker != None and board[self.x-i-1][self.y+i+1].checker.player  != self.player and board[self.x-i-2][self.y+i+2].checker == None:
-                                    moves.append((self.x-i-2, self.y+i+2))
-                            moves.append((self.x-i, self.y+i))
-                            break
             
 
 
@@ -180,29 +184,31 @@ class CheckerPiece:
             for i in range(1,rightrng):
                 # check for own color in diags
                 if self.y - i >= 0:
-                    if board[self.x+i][self.y-i].checker != None:
-                        if board[self.x+i][self.y-i].checker.player == RED:
+                    if self.x + i < 8:  
+                        if board[self.x+i][self.y-i].checker != None:
+                            if board[self.x+i][self.y-i].checker.player == RED:
+                                break
+                        if board[self.x+i][self.y-i].checker == None:
+                            # if i == 2; meaning this move is a jump, check if can double jump
+                            if i == 2 and 0 <= self.x+i+2 < 8 and 0<= self.y-i+2 < 8:
+                                if board[self.x+i+1][self.y-i-1].checker != None and board[self.x+i+1][self.y-i-1].checker.player  == BLACK and board[self.x+i+2][self.y-i-2].checker == None:
+                                    moves.append((self.x+i+2, self.y-i-2))
+                            moves.append((self.x+i,self.y-i))
+                        
                             break
-                    if board[self.x+i][self.y-i].checker == None:
-                        # if i == 2; meaning this move is a jump, check if can double jump
-                        if i == 2 and 0 <= self.x+i+2 < 8 and 0<= self.y-i+2 < 8:
-                            if board[self.x+i+1][self.y-i-1].checker != None and board[self.x+i+1][self.y-i-1].checker.player  == BLACK and board[self.x+i+2][self.y-i-2].checker == None:
-                                moves.append((self.x+i+2, self.y-i-2))
-                        moves.append((self.x+i,self.y-i))
-                       
-                        break
                
             for i in range(1, leftrng):
                 if self.y - i >= 0:
-                    if board[self.x-i][self.y-i].checker != None:
-                        if board[self.x-i][self.y-i].checker.player == RED:
+                    if self.x - i >= 0:
+                        if board[self.x-i][self.y-i].checker != None:
+                            if board[self.x-i][self.y-i].checker.player == RED:
+                                break
+                        if board[self.x-i][self.y-i].checker == None:
+                            if i == 2 and 0 <= self.x-i+2 < 8 and 0<= self.y-i+2 < 8:
+                                if board[self.x-i-1][self.y-i-1].checker != None and board[self.x-i-1][self.y-i-1].checker.player  == BLACK and board[self.x-i-2][self.y-i-2].checker == None:
+                                    moves.append((self.x-i-2, self.y-i-2))
+                            moves.append((self.x-i, self.y-i))
                             break
-                    if board[self.x-i][self.y-i].checker == None:
-                        if i == 2 and 0 <= self.x-i+2 < 8 and 0<= self.y-i+2 < 8:
-                            if board[self.x-i-1][self.y-i-1].checker != None and board[self.x-i-1][self.y-i-1].checker.player  == BLACK and board[self.x-i-2][self.y-i-2].checker == None:
-                                moves.append((self.x-i-2, self.y-i-2))
-                        moves.append((self.x-i, self.y-i))
-                        break
 
         if self.player == BLACK:
             
@@ -211,29 +217,36 @@ class CheckerPiece:
                 # check for own color in diags
                 # print(self.x+i, self.y+i)
                 if self.y + i < 8:
-                    if board[self.x+i][self.y+i].checker != None:
-                        if board[self.x+i][self.y+i].checker.player == BLACK:
+                    if self.x+i < 8:
+                        if board[self.x+i][self.y+i].checker != None:
+                            if board[self.x+i][self.y+i].checker.player == BLACK:
+                                break
+                        if board[self.x+i][self.y+i].checker == None:
+                            if i == 2 and 0 <= self.x+i+2 < 8 and 0<= self.y+i+2 < 8:
+                                if board[self.x+i+1][self.y+i+1].checker != None and board[self.x+i+1][self.y+i+1].checker.player  == RED and board[self.x+i+2][self.y+i+2].checker == None:
+                                    moves.append((self.x+i+2, self.y+i+2))
+                            moves.append((self.x+i,self.y+i))
                             break
-                    if board[self.x+i][self.y+i].checker == None:
-                        if i == 2 and 0 <= self.x+i+2 < 8 and 0<= self.y+i+2 < 8:
-                            if board[self.x+i+1][self.y+i+1].checker != None and board[self.x+i+1][self.y+i+1].checker.player  == RED and board[self.x+i+2][self.y+i+2].checker == None:
-                                moves.append((self.x+i+2, self.y+i+2))
-                        moves.append((self.x+i,self.y+i))
-                        break
             for i in range(1, leftrng):
                 if self.y + i < 8:
-                    if board[self.x-i][self.y+i].checker != None:
-                        if board[self.x-i][self.y+i].checker.player == BLACK:
+                    if self.x - i >= 0:
+                        if board[self.x-i][self.y+i].checker != None:
+                            if board[self.x-i][self.y+i].checker.player == BLACK:
+                                break
+                        if board[self.x-i][self.y+i].checker == None:
+                            if i == 2 and 0 <= self.x-i+2 < 8 and 0<= self.y+i+2 < 8:
+                                if board[self.x-i-1][self.y+i+1].checker != None and board[self.x-i-1][self.y+i+1].checker.player  == RED and board[self.x-i-2][self.y+i+2].checker == None:
+                                    moves.append((self.x-i-2, self.y+i+2))
+                            moves.append((self.x-i, self.y+i))
                             break
-                    if board[self.x-i][self.y+i].checker == None:
-                        if i == 2 and 0 <= self.x-i+2 < 8 and 0<= self.y+i+2 < 8:
-                            if board[self.x-i-1][self.y+i+1].checker != None and board[self.x-i-1][self.y+i+1].checker.player  == RED and board[self.x-i-2][self.y+i+2].checker == None:
-                                moves.append((self.x-i-2, self.y+i+2))
-                        moves.append((self.x-i, self.y+i))
-                        break
             
                     # have handled x being out of range, need to handle y out of range 
                     # also need to handle king, but he can b separate case and apply to both colors 
+
+        for move in moves:
+            if move[0] < 0 or move[1] < 0:
+                moves.remove(move)
+            
         return moves  
     
 
@@ -268,6 +281,7 @@ class Board:
         self.black_count = self.red_count =  12
         self.black_kings = self.red_kings = 0
         self.black_adv = self.red_adv = 0
+        self.num_plys = 0
 
         self.players = cycle([RED, BLACK])
         self.turn = self.players.__next__()
@@ -352,12 +366,12 @@ class Board:
         for piece in self.getAllPieces(BLACK):
             if piece.king:
                 self.black_kings += 1
-            if piece.y >= 4:
+            if piece.y >= 5:
                 self.black_adv += .3*(piece.y)
         for piece in self.getAllPieces(RED):
             if piece.king:
                 self.red_kings += 1
-            if piece.y < 4:
+            if piece.y < 3:
                 self.red_adv += .3*(7-piece.y)
 
     def resetCount(self):
@@ -374,17 +388,35 @@ class Board:
         # if self.red_count == 1:
         #     score += self.red_count
         #     return score
-    
+
+        # if no ply has been comleted yet; score moves randomly such that board 
+        if self.num_plys == 0:
+            score = random.randint(-12, 12)
+            return score 
+            
+        black_weight = 1
+        red_weight = 1
+
+
+        # if self.red_count - self.black_count > 0:
+        #     # if red has more pieces than black; increase weight of black count so red prioritizes taking it
+        #     black_weight = self.red_count - self.black_count
+        # elif self.black_count - self.red_count > 0:
+        #     red_weight = self.black_count - self.red_count
+        # this is not working as intended so leave out for now 
+
+
         for piece in self.getAllPieces(RED):
             if piece.king:
-                score += 5
+                score += 5*red_weight
             else:
-                score += 2
+                score += 2*red_weight
         for piece in self.getAllPieces(BLACK):
             if piece.king:
-                score -= 5
+                score -= 5*black_weight
             else:
-                score -= 2
+                score -= 2*black_weight
+
         score += self.red_adv/(abs(self.red_count-self.black_count)+1)
         score -= self.black_adv/(abs(self.red_count-self.black_count)+1)
         
@@ -412,9 +444,9 @@ class Board:
         for i in range(2):
             if len(self.getAllPieces(self.players.__next__())) == 0:
                 return True
-        #     for piece in self.getAllPieces(self.players.__next__()):
-        #         num_moves += len(piece.getValidMoves(self.board))
-        # if num_moves == 0:
-        #     return True
+            for piece in self.getAllPieces(self.players.__next__()):
+                num_moves += len(piece.getValidMoves(self.board))
+        if num_moves == 0:
+            return True
 
         return False
