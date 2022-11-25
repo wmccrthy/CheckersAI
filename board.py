@@ -83,6 +83,7 @@ class Cell:
     def drawMoves(self, window, board):
         if self.checker != None:
             moves = self.checker.getValidMoves(board)
+            # moves = self.checker.getValidMovesOPT(board)
             for move in moves:
                 if self.checker.player == BLACK:
                     pg.draw.circle(window, (0, 0, 0), (move[0] * cell_width + cell_width/2, move[1] * cell_height + cell_height/2), cell_height/9+1)
@@ -113,7 +114,7 @@ class CheckerPiece:
 
     def getValidMoves(self, board):
         moves = []
-        self.skipped = []
+        skipped = []
         # to store pairs of moves that capture pieces w pieces captured such that if move is selected, we remove relevant 
 
         # moves appended in (x, y) coordinate tuples 
@@ -303,6 +304,8 @@ class Board:
     def move(self, cell, c, r, piece):
         if (c,r) not in piece.getValidMoves(self.board):
             return
+        # if (c,r) not in piece.getValidMovesOPT(self.board):
+            # return
         self.board[c][r].placePiece(piece)
         cell.removePiece()
         if piece.player == BLACK and r == 7:
@@ -382,59 +385,50 @@ class Board:
 
     def evalFunction(self): 
         score = 0
-        # if self.black_count == 1:
-        #     score -= self.black_count
-        #     return score
-        # if self.red_count == 1:
-        #     score += self.red_count
-        #     return score
-
+       
         # if no ply has been comleted yet; score moves randomly such that board 
+        if self.terminalTest():
+            if self.turn == RED:
+                return 100
+            else:
+                return -100
+
+                
         if self.num_plys == 0:
             score = random.randint(-12, 12)
             return score 
-            
-        black_weight = 1
-        red_weight = 1
+        if self.num_plys > 20:
+            score += 2*(self.red_count - self.black_count)
+            for posR in self.getAllPieces(RED):
+                for pos in self.getAllPieces(BLACK):
+                    if self.black_count > self.red_count:
+                        score += util.manhattanDistance((posR.x,posR.y), (pos.x, pos.y))
+                    if self.red_count > self.black_count:
+                        score -= util.manhattanDistance((posR.x, posR.y),(pos.x, pos.y))
+                    score /= abs(self.red_count - self.black_count)+.01
+            return score
 
+        if len(self.getAllPieces(RED)) + len(self.getAllPieces(BLACK)) < 15:
+            score += 1.5*(self.red_count - self.black_count)
 
-        # if self.red_count - self.black_count > 0:
-        #     # if red has more pieces than black; increase weight of black count so red prioritizes taking it
-        #     black_weight = self.red_count - self.black_count
-        # elif self.black_count - self.red_count > 0:
-        #     red_weight = self.black_count - self.red_count
-        # this is not working as intended so leave out for now 
+            # incorporate factor that scores positions based on overall distance to other pieces; 
+            # 
+            # for posR in self.getAllPieces(RED):
+            #     for pos in self.getAllPieces(BLACK):
+            #         if self.black_count > self.red_count:
+            #             score += util.manhattanDistance((posR.x,posR.y), (pos.x, pos.y))
+            #         if self.red_count > self.black_count:
+            #             score -= util.manhattanDistance((posR.x, posR.y),(pos.x, pos.y))
 
-
+     
         for piece in self.getAllPieces(RED):
             if piece.king:
-                score += 5*red_weight
-            else:
-                score += 2*red_weight
+                score += 2
+            score += 5+(7-piece.y)
         for piece in self.getAllPieces(BLACK):
             if piece.king:
-                score -= 5*black_weight
-            else:
-                score -= 2*black_weight
-
-        score += self.red_adv/(abs(self.red_count-self.black_count)+1)
-        score -= self.black_adv/(abs(self.red_count-self.black_count)+1)
-        
-        
-        # score action based on its score; actions will be stored in the resultant board state which will be evaluated by the function
-        # factors to evaluate based on:
-        #   - number of pieces of certain color
-        #   - number of kings of certain color 
-        #   - number of pieces past certain row (in upper half of board)
-        #   - very lowlight weighted: number of valid moves of certain color 
-        #   - is eval function within the board state itself? 
-        # `
-
-        # eval function works fine right now but can definitely be better 
-        # modify to counts to have different weight in different circumstances 
-        # so, depending on number of pieces of certain color, change weights 
-        # for example if black has many pieces and red has few, weight the value of red pieces more such that alg is incentivized 
-        # to play aggressive and take out the few remaining pieces 
+                score -= 2
+            score -= (5+piece.y)
 
         return score 
     

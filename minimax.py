@@ -1,6 +1,8 @@
 import pygame as pg 
 import board as Board
 from copy import deepcopy
+import util
+import random
 RED = (250,0,0)
 BLACK = (0,0,0)
 
@@ -9,30 +11,44 @@ BLACK = (0,0,0)
 # precise conditions are leading to bug as of now 
 
 
-def evalFunction(board): 
+def evalFunction(self): 
         score = 0
-        # if self.black_count == 1:
-        #     score -= self.black_count
-        #     return score
-        # if self.red_count == 1:
-        #     score += self.red_count
-        #     return score
-        
-        for piece in board.getAllPieces(RED):
-            if piece.king:
-                score += 5
+   
+        # if no ply has been comleted yet; score moves randomly such that board 
+        if self.terminalTest():
+            if self.turn == RED:
+                return 100
             else:
-                score += 2
-        for piece in board.getAllPieces(BLACK):
-            if piece.king:
-                score -= 5
-            else:
-                score -= 2
-        score += board.red_adv/(abs(board.red_count-board.black_count)+1)
-        score -= board.black_adv/(abs(board.red_count-board.black_count)+1)
+                return -100
 
-        return score
-        
+                
+        if self.num_plys == 0:
+            score = random.randint(-12, 12)
+            return score 
+        if self.num_plys > 20:
+            score += 2*(self.red_count - self.black_count)
+            for posR in self.getAllPieces(RED):
+                for pos in self.getAllPieces(BLACK):
+                    if self.black_count > self.red_count:
+                        score += util.manhattanDistance((posR.x,posR.y), (pos.x, pos.y))
+                    if self.red_count > self.black_count:
+                        score -= util.manhattanDistance((posR.x, posR.y),(pos.x, pos.y))
+                    score /= abs(self.red_count - self.black_count)+.01
+            return score
+
+        if len(self.getAllPieces(RED)) + len(self.getAllPieces(BLACK)) < 15:
+            score += 1.5*(self.red_count - self.black_count)
+
+        for piece in self.getAllPieces(RED):
+            if piece.king:
+                score += 2
+            score += 5+(7-piece.y)
+        for piece in self.getAllPieces(BLACK):
+            if piece.king:
+                score -= 2
+            score -= (5+piece.y)
+
+        return score  
 
 def getAllSuccessors(board, color):
     moves = []
@@ -53,6 +69,7 @@ def getSuccessor(piece, move, board):
     start_y = piece.y
     prnt = str(piece.x) + "," + str(piece.y)
     if board.turn == piece.player:
+        removed = 0
         # if abs(move[0] - start_x) > 2 or abs(move[1] - start_y > 2):
         #     print("Move from: " + prnt + " to: " + str(move))
         board.move(board.board[start_x][start_y], move[0],move[1], board.getPiece(start_x,start_y))
@@ -66,6 +83,8 @@ def getSuccessor(piece, move, board):
                     board.red_count -= 1
                 if board.getPiece(x,y).player != piece.player:
                     board.removePiece(x, y)
+                    removed += 1
+        # if removed != 1:
         board.turn = board.players.__next__()
     return board
 

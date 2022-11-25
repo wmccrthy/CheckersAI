@@ -64,7 +64,7 @@ def play():
     while True:
         window.fill((0,0,0))
         while run:
-            clock.tick(60)
+            # clock.tick(60)
             pg.display.flip()
 
             test.resetCount()
@@ -90,9 +90,10 @@ def play():
                 if test.turn == BLACK:
                     selected = False
                     old_board = test
-                    new_board = minimax.minValue(test, 3, -99999, 99999, min_transposition, max_transposition)[1]
+                    new_board = minimax.minValue(test, 4, -99999, 99999, min_transposition, max_transposition)[1]
                     # new_board = minimax.EminValue(test, 3)[1]
                     test = new_board
+                    clock.tick(60)
                     test.num_plys += 1
                     print("Turn: " + str(test.turn))
                     print("SCORE: " + str(test.evalFunction()))
@@ -100,6 +101,9 @@ def play():
                 else: 
                     if zeroP:
                         selected = False
+                        # if test.turn != RED:
+                            # test.turn = test.players.__next__()
+                        # new_board = minimax.maxValue(test, 4, -99999, 99999, max_transposition, min_transposition)[1]
                         new_board = minimax.EmaxValue(test, 3)[1]
                         test = new_board
                         # test.turn = test.players.__next__()
@@ -128,11 +132,23 @@ def play():
                     mc, mr = test.mouseRC(param)
                     if test.getPiece(c,r) == None:
                             continue
+
                     if (mc,mr) not in test.getPiece(c,r).getValidMoves(test.board):
                         continue
+
+                    # if (mc, mr) not in test.getPiece(c,r).getValidMovesOPT(test.board):
+                    #     continue 
                     if test.getPiece(c,r).player == test.turn:
+                        removed = 0
+
+                        # removal new
+                        # for m_s in test.getPiece(c,r).getValidMovesOPT(test.board):
+                        #     # if move chosen is move on
+                        #     if m_s[0] == (mc,mr):
+                        #         # iterate thorugh skipped pos for that move and remove them
+                        #         for skip in m_s[1]:
+                        #             test.removePiece(skip[0], skip[1])
                         test.move(test.board[c][r], mc,mr, test.getPiece(c,r))
-                    
                         for pos in test.getDiagonals(c,r, mc, mr):
                             x = pos[0]
                             y = pos[1]
@@ -143,10 +159,12 @@ def play():
                                     test.red_count -= 1
                                 if test.getPiece(x,y).player != test.turn:
                                     test.removePiece(x, y)
+                                    removed += 1
+                       
                         print("Black Pieces: " + str(test.black_count) + " Black Kings: " + str(test.black_kings))
                         print("Red Pieces: " + str(test.red_count) + " Red Kings: " + str(test.red_kings))
                         print("Score: " + str(test.evalFunction()))
-
+                        # if removed != 1:
                         test.turn = test.players.__next__()
                     
                         selected = False
