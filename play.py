@@ -1,9 +1,9 @@
 import board 
 import minimax
-import util
 import pygame as pg
-import random
 import sys
+import time
+from statistics import mean
 from itertools import cycle
 
 
@@ -22,8 +22,27 @@ font = pg.font.SysFont('chalkboardse', 15)
 bigFont = pg.font.SysFont('chalkboardse', 40)
 
 def play(): 
-    max_transposition = util.Counter()
-    min_transposition = util.Counter()
+
+    max_transposition = [None] * 4999
+    min_transposition = [None] * 4999
+
+    # run test game before hand to fill transposition tables so ai starts out at optimal speed 
+    test_runs = board.Board()
+    test_games = 0
+    while test_games < 3:
+        if test_runs.terminalTest() or test_runs.num_plys > 75:
+            print("Test Game Over: " + str(test_runs.black_count))
+            test_games += 1
+            test_runs = board.Board()
+        if test_runs.turn == BLACK:
+             test_runs = minimax.minValue(test_runs, 1, -99999, 99999, min_transposition, max_transposition)[1]
+             test_runs.num_plys += 1
+        else:
+            test_runs = minimax.EmaxValue(test_runs, 1)[1]
+            # test_runs = minimax.maxValue(test_runs, 1, -99999, 99999, max_transposition, min_transposition)[1]
+        test_runs.resetCount()
+        test_runs.updateKingCount()
+
 
     menu = True
     oneP  = False
@@ -63,22 +82,30 @@ def play():
     old_board = None
     while True:
         window.fill((0,0,0))
+        
+        minimax_runtimes = []
+        expectiminimax_runtimes = []
+        # lists used for computing avg computation time of algorithms after terminal state reached 
+
         while run:
-            # clock.tick(60)
+            # pg.display.quit()
             pg.display.flip()
 
-            test.resetCount()
-            test.updateKingCount()
-
             if test.terminalTest():
-                window.fill((0,0,0))
-                if test.evalFunction() > 0:
+                # window.fill((0,0,0))
+                if test.red_count > test.black_count:
                     print("GAME OVER | WINNER: RED | SCORE: " + str(test.evalFunction()))
                     res = "GAME OVER | WINNER: RED | SCORE: " + str(test.evalFunction())
                 else:
-                    res = "GAME OVER | WINNER: BLACK | SCORE: " + str(test.evalFunction())
                     print("GAME OVER | WINNER: BLACK | SCORE: " + str(test.evalFunction()))
+                    res = "GAME OVER | WINNER: BLACK | SCORE: " + str(test.evalFunction())
+                if oneP:
+                    print("Average Minimax Decision Time: " + str(mean(minimax_runtimes)) + " Seconds | Best Time: " + str(min(minimax_runtimes)) + " Seconds | Worst Time: " + str(max(minimax_runtimes)) + " Seconds")
+                    if zeroP:
+                        print("Average Expectimax Decision Time: " + str(mean(expectiminimax_runtimes)) + " Seconds | Best Time: " + str(min(expectiminimax_runtimes)) + " Seconds | Worst Time: " + str(max(expectiminimax_runtimes)) + " Seconds")
+                    print()
                 run = False
+                break
 
             # to debug minimax, have an input that allows you to undo a turn, will allow me to see precisely where
             # and thus hopefully deduce why minimax might be going wrong; ok, definitely minimax that is bugging; question is
@@ -88,29 +115,47 @@ def play():
             
             if oneP:
                 if test.turn == BLACK:
+                    start = time.perf_counter()
                     selected = False
                     old_board = test
+                    ensure_numplys = test.num_plys
                     new_board = minimax.minValue(test, 4, -99999, 99999, min_transposition, max_transposition)[1]
-                    # new_board = minimax.EminValue(test, 3)[1]
+                    # change depth to make opponent harder 
+                    # change to new_board = minimax.Eminvalue() to play against expectiminimax
                     test = new_board
-                    clock.tick(60)
-                    test.num_plys += 1
-                    print("Turn: " + str(test.turn))
-                    print("SCORE: " + str(test.evalFunction()))
+                    runtime = time.perf_counter() - start
+                    minimax_runtimes.append(runtime)
+                    test.num_plys = ensure_numplys + 1
+                    test.resetCount()
+                    test.updateKingCount()
+                    print("MINIMAX TURN: ")
+                    print("Black Pieces: " + str(test.black_count) + " Black Kings: " + str(test.black_kings) + " Black Pawns: " + str(test.black_pawns) + " Black Back: " + str(test.black_back) + " Black Mid: " + str(test.black_mid) + " Black Vuln: " + str(test.black_vuln) )
+                    print("Red Pieces: " + str(test.red_count) + " Red Kings: " + str(test.red_kings) + " Red Pawns: " + str(test.red_pawns) + " Red Back: " + str(test.red_back) + " Red Mid: " + str(test.red_mid) + " Red Vuln: " + str(test.red_vuln))
+                    print("Score: " + str(test.evalFunction()))
                     print("Plys Completed: " + str(test.num_plys))
-                else: 
-                    if zeroP:
-                        selected = False
-                        # if test.turn != RED:
-                            # test.turn = test.players.__next__()
-                        # new_board = minimax.maxValue(test, 4, -99999, 99999, max_transposition, min_transposition)[1]
-                        new_board = minimax.EmaxValue(test, 3)[1]
-                        test = new_board
-                        # test.turn = test.players.__next__()
-                        print("Turn: " + str(test.turn))
-                        print("SCORE: " + str(test.evalFunction()))
+                    print("Time Taken to Compute Move: " + str(runtime) + " seconds")
+                    print()
 
+                 
+                elif zeroP: 
+                    selected = False
+                    # new_board = minimax.maxValue(test, 2, -99999, 99999, max_transposition, min_transposition)[1]
+                    start = time.perf_counter()
+                    new_board = minimax.EmaxValue(test, 1)[1]
+                    test = new_board
+                    test.resetCount()
+                    test.updateKingCount()
+                    runtime = time.perf_counter() - start
+                    expectiminimax_runtimes.append(runtime)
+                    print("EXPECTIMAX TURN: ")
+                    print("Black Pieces: " + str(test.black_count) + " Black Kings: " + str(test.black_kings) + " Black Pawns: " + str(test.black_pawns) + " Black Back: " + str(test.black_back) + " Black Mid: " + str(test.black_mid) + " Black Vuln: " + str(test.black_vuln) )
+                    print("Red Pieces: " + str(test.red_count) + " Red Kings: " + str(test.red_kings) + " Red Pawns: " + str(test.red_pawns) + " Red Back: " + str(test.red_back) + " Red Mid: " + str(test.red_mid) + " Red Vuln: " + str(test.red_vuln))
+                    print("Score: " + str(test.evalFunction()))
+                    print("Plys Completed: " + str(test.num_plys))
+                    print("Time Taken to Compute Move: " + str(runtime) + " seconds")
+                    print()
 
+  
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()
@@ -136,18 +181,9 @@ def play():
                     if (mc,mr) not in test.getPiece(c,r).getValidMoves(test.board):
                         continue
 
-                    # if (mc, mr) not in test.getPiece(c,r).getValidMovesOPT(test.board):
-                    #     continue 
                     if test.getPiece(c,r).player == test.turn:
                         removed = 0
 
-                        # removal new
-                        # for m_s in test.getPiece(c,r).getValidMovesOPT(test.board):
-                        #     # if move chosen is move on
-                        #     if m_s[0] == (mc,mr):
-                        #         # iterate thorugh skipped pos for that move and remove them
-                        #         for skip in m_s[1]:
-                        #             test.removePiece(skip[0], skip[1])
                         test.move(test.board[c][r], mc,mr, test.getPiece(c,r))
                         for pos in test.getDiagonals(c,r, mc, mr):
                             x = pos[0]
@@ -160,15 +196,24 @@ def play():
                                 if test.getPiece(x,y).player != test.turn:
                                     test.removePiece(x, y)
                                     removed += 1
-                       
-                        print("Black Pieces: " + str(test.black_count) + " Black Kings: " + str(test.black_kings))
-                        print("Red Pieces: " + str(test.red_count) + " Red Kings: " + str(test.red_kings))
-                        print("Score: " + str(test.evalFunction()))
-                        # if removed != 1:
-                        test.turn = test.players.__next__()
-                    
-                        selected = False
+                        
+                        test.turn = test.players.__next__() 
 
+                       
+                        # purely to count vulnerables 
+                        selected = False
+                        print("PLAYER TURN: ")
+                        print("Black Pieces: " + str(test.black_count) + " Black Kings: " + str(test.black_kings) + " Black Pawns: " + str(test.black_pawns) + " Black Back: " + str(test.black_back) + " Black Mid: " + str(test.black_mid) + " Black Vuln: " + str(test.black_vuln) )
+                        print("Red Pieces: " + str(test.red_count) + " Red Kings: " + str(test.red_kings) + " Red Pawns: " + str(test.red_pawns) + " Red Back: " + str(test.red_back) + " Red Mid: " + str(test.red_mid) + " Red Vuln: " + str(test.red_vuln))
+                        print("Turn: " + str(test.turn))
+                        print("Score: " + str(test.evalFunction()))
+                        print("Plys Completed: " + str(test.num_plys))
+                        print()
+
+            test.resetCount()
+            test.updateKingCount()
+            
+           
             test.drawBoard(window)
             if selected:
                 # if the piece selected is whose turn it is

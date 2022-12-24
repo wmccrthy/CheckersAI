@@ -55,29 +55,29 @@ class Cell:
 
         # highlights piece cell  being hovered over 
         if self.withinRange((c,r)):
-            pg.draw.rect(window, (150, 150, 150), (self.x * cell_width, self.y * cell_height, cell_width-2, cell_height-2))
+            pg.draw.rect(window, (250, 250, 250), (self.x * cell_width, self.y * cell_height, cell_width-2, cell_height-2))
         else:
             # implement logic to draw alternating colors 
             if self.y%2 == 0:
                 if self.x%2== 0:
                     pg.draw.rect(window, (0,0,0), (self.x * cell_width, self.y * cell_height, cell_width-2, cell_height-2))
                 else:
-                    pg.draw.rect(window, (210,180,140), (self.x * cell_width, self.y * cell_height, cell_width-2, cell_height-2))
+                    pg.draw.rect(window,(239,159,95), (self.x * cell_width, self.y * cell_height, cell_width-2, cell_height-2))
             else:
                 if self.x%2== 0:
-                    pg.draw.rect(window,(210,180,140), (self.x * cell_width, self.y * cell_height, cell_width-2, cell_height-2))
+                    pg.draw.rect(window,(239,159,95), (self.x * cell_width, self.y * cell_height, cell_width-2, cell_height-2))
                 else:
                     pg.draw.rect(window, (0,0,0), (self.x * cell_width, self.y * cell_height, cell_width-2, cell_height-2))
         if self.checker != None:
             if self.checker.king:
-                pg.draw.circle(window, self.checker.player, (self.checker.x * cell_width + cell_width/2, self.checker.y * cell_height + cell_height/2), (cell_width/2.5))
+                pg.draw.circle(window, self.checker.player, (self.checker.x * cell_width + cell_width/2, self.checker.y * cell_height + cell_height/2), (cell_width/3))
                 pg.draw.circle(window, (250,250,250), (self.checker.x * cell_width + cell_width/2, self.checker.y * cell_height + cell_height/2), (cell_width/9))
             else:
                 if self.checker.player == RED:
-                    pg.draw.circle(window, (0,0,0), (self.checker.x * cell_width + cell_width/2, self.checker.y * cell_height + cell_height/2), (cell_width/2.5)+1)
+                    pg.draw.circle(window, (0,0,0), (self.checker.x * cell_width + cell_width/2, self.checker.y * cell_height + cell_height/2), (cell_width/3)+1)
                 else:
-                     pg.draw.circle(window, (200,200,200), (self.checker.x * cell_width + cell_width/2, self.checker.y * cell_height + cell_height/2), (cell_width/2.5)+1)
-                pg.draw.circle(window, self.checker.player, (self.checker.x * cell_width + cell_width/2, self.checker.y * cell_height + cell_height/2), (cell_width/2.5))
+                     pg.draw.circle(window, (200,200,200), (self.checker.x * cell_width + cell_width/2, self.checker.y * cell_height + cell_height/2), (cell_width/3)+1)
+                pg.draw.circle(window, self.checker.player, (self.checker.x * cell_width + cell_width/2, self.checker.y * cell_height + cell_height/2), (cell_width/3))
                 
 
     def drawMoves(self, window, board):
@@ -86,18 +86,18 @@ class Cell:
             # moves = self.checker.getValidMovesOPT(board)
             for move in moves:
                 if self.checker.player == BLACK:
-                    pg.draw.circle(window, (0, 0, 0), (move[0] * cell_width + cell_width/2, move[1] * cell_height + cell_height/2), cell_height/9+1)
-                    pg.draw.circle(window, (150, 150, 150), (move[0] * cell_width + cell_width/2, move[1] * cell_height + cell_height/2), cell_height/9)
+                    # pg.draw.circle(window, (0, 0, 0), (move[0] * cell_width + cell_width/2, move[1] * cell_height + cell_height/2), cell_height/9+.5)
+                    pg.draw.circle(window, (250, 250, 250), (move[0] * cell_width + cell_width/2, move[1] * cell_height + cell_height/2), cell_height/9)
        
                 else:
-                    pg.draw.circle(window, (0, 0, 0), (move[0] * cell_width + cell_width/2, move[1] * cell_height + cell_height/2), cell_height/9+1)
-                    pg.draw.circle(window, (150, 150, 150), (move[0] * cell_width + cell_width/2, move[1] * cell_height + cell_height/2), cell_height/9)
+                    # pg.draw.circle(window, (0, 0, 0), (move[0] * cell_width + cell_width/2, move[1] * cell_height + cell_height/2), cell_height/9+.5)
+                    pg.draw.circle(window, (250, 250, 250), (move[0] * cell_width + cell_width/2, move[1] * cell_height + cell_height/2), cell_height/9)
         # highlight cells that can be moved into 
 
            
         # also highlight the cell currently selected 
         if self.checker != None:
-            pg.draw.rect(window, (150, 150, 150), (self.x * cell_width, self.y * cell_height, cell_width-2, cell_height-2))
+            pg.draw.rect(window, (220, 220, 220), (self.x * cell_width, self.y * cell_height, cell_width-2, cell_height-2))
             pg.draw.circle(window, self.checker.player, (self.checker.x * cell_width + cell_width/2, self.checker.y * cell_height + cell_height/2), (cell_width/2.6))
             if self.checker.king:
                 pg.draw.circle(window, (250,250,250), (self.checker.x * cell_width + cell_width/2, self.checker.y * cell_height + cell_height/2), (cell_width/9.3))
@@ -280,8 +280,21 @@ class Board:
             self.board.append(curRow)
         
         self.black_count = self.red_count =  12
+        self.black_pawns = self.red_pawns = 0
         self.black_kings = self.red_kings = 0
-        self.black_adv = self.red_adv = 0
+        self.red_back = self.black_back = 0
+        self.red_mid = self.black_mid = 0
+        self.red_outsidemid = self.black_outsidemid = 0
+        self.red_vuln = self.black_vuln = 0
+
+        # need to figure out way to keep track of vulnerable pieces 
+        # use getAllSuccessors function; loop through successors, number of vulnerable pieces of color
+        # should be equal to the ddifference between self.red/black_count and the successor w the smallest
+        # count of same color
+
+
+        # self.black_adv = self.red_adv = 0
+        
         self.num_plys = 0
 
         self.players = cycle([RED, BLACK])
@@ -365,70 +378,174 @@ class Board:
                         pieces.append(self.board[c][r].checker)
         return pieces
 
+    def isPieceVuln(self, piece):
+        vulnerable = False
+
+        if piece.y < 1 or piece.y > 6 or piece.x < 1 or piece.x > 6:
+            return vulnerable
+
+        top_left = (piece.x-1, piece.y-1)
+        top_right = (piece.x+1, piece.y-1)
+        bottom_left = (piece.x-1, piece.y+1)
+        bottom_right = (piece.x+1, piece.y+1)
+
+        # if piece in topleft  
+        if self.getPiece(top_left[0], top_left[1]) != None:
+            if self.getPiece(top_left[0], top_left[1]).player != piece.player:
+                # if reach here, top left is opposing piece
+                if self.getPiece(bottom_right[0], bottom_right[1]) == None:
+                    vulnerable = True
+                    return vulnerable
+        # if top right
+        if self.getPiece(top_right[0], top_right[1]) != None:
+            if self.getPiece(top_right[0], top_right[1]).player != piece.player:
+                # if reach here, top left is opposing piece
+                if self.getPiece(bottom_left[0], bottom_left[1]) == None:
+                    vulnerable = True
+                    return vulnerable
+
+        # if bottom left
+        if self.getPiece(bottom_left[0], bottom_left[1]) != None:
+            if self.getPiece(bottom_left[0], bottom_left[1]).player != piece.player:
+                # if reach here, top left is opposing piece
+                if self.getPiece(top_right[0], top_right[1]) == None:
+                    vulnerable = True
+                    return vulnerable
+        
+        # if bottom right 
+        if self.getPiece(bottom_right[0], bottom_right[1]) != None:
+            if self.getPiece(bottom_right[0], bottom_right[1]).player != piece.player:
+                # if reach here, top left is opposing piece
+                if self.getPiece(top_left[0], top_left[1]) == None:
+                    vulnerable = True
+                    return vulnerable
+                
+        return vulnerable
+
+            
+
     def updateKingCount(self):
+        
+        # to gain loose/usually correct value for vulnerable pieces, do it in here. 
+        # Check the direct diagonals of each piece, if it has piece of other color on one side,
+        # check the opposite diagonal to see if it can be jumped; incorporate fact that only king can 
+        # go backwards in this 
+
         for piece in self.getAllPieces(BLACK):
+            if self.isPieceVuln(piece):
+                self.black_vuln += 1
             if piece.king:
                 self.black_kings += 1
-            if piece.y >= 5:
-                self.black_adv += .3*(piece.y)
+            if piece.y == 0:
+                self.black_back += 1
+            if piece.y == 3 or piece.y == 4:
+                if piece.x < 2 or piece.x > 5:
+                    self.black_outsidemid += 1
+                else:
+                    self.black_mid += 1     
+
+        
+            # if piece.y >= 5:
+            #     self.black_adv += .3*(piece.y)
         for piece in self.getAllPieces(RED):
+            if self.isPieceVuln(piece):
+                self.red_vuln += 1
             if piece.king:
                 self.red_kings += 1
-            if piece.y < 3:
-                self.red_adv += .3*(7-piece.y)
+            if piece.y == 7:
+                self.red_back += 1
+            if piece.y == 3 or piece.y == 4:
+                if piece.x < 2 or piece.x > 5:
+                    self.red_outsidemid += 1
+                else:
+                    self.red_mid += 1
+
+
+            # if piece.y < 3:
+            #     self.red_adv += .3*(7-piece.y)
+        
+        self.black_pawns = self.black_count - self.black_kings
+        self.red_pawns = self.red_count - self.red_kings 
+
 
     def resetCount(self):
-        self.black_kings = 0
-        self.red_kings = 0
-        self.red_adv = 0
-        self.black_adv = 0
+        self.black_kings = self.red_kings = 0
+        self.red_back = self.black_back = 0
+        self.red_mid = self.black_mid = 0
+        self.red_outsidemid = self.black_outsidemid = 0
+        self.black_adv = self.red_adv = 0
+        self.black_vuln = self.red_vuln = 0
 
     def evalFunction(self): 
         score = 0
        
-        # if no ply has been comleted yet; score moves randomly such that board 
-        if self.terminalTest():
-            if self.turn == RED:
-                return 100
-            else:
-                return -100
+        # # if no ply has been comleted yet; score moves randomly such that board 
+        # if self.terminalTest():
+        #     if self.turn == RED:
+        #         return 100
+        #     else:
+        #         return -100
 
                 
+        # if self.num_plys == 0:
+        #     score = random.randint(-12, 12)
+        #     return score 
+        # if self.num_plys > 20:
+        #     score += 2*(self.red_count - self.black_count)
+        #     for posR in self.getAllPieces(RED):
+        #         for pos in self.getAllPieces(BLACK):
+        #             if self.black_count > self.red_count:
+        #                 score += util.manhattanDistance((posR.x,posR.y), (pos.x, pos.y))
+        #             if self.red_count > self.black_count:
+        #                 score -= util.manhattanDistance((posR.x, posR.y),(pos.x, pos.y))
+        #             score /= abs(self.red_count - self.black_count)+.01
+        #     return score
+
+        # if len(self.getAllPieces(RED)) + len(self.getAllPieces(BLACK)) < 15:
+        #     score += 1.5*(self.red_count - self.black_count)
+
+        #     # incorporate factor that scores positions based on overall distance to other pieces; 
+        #     # 
+        #     # for posR in self.getAllPieces(RED):
+        #     #     for pos in self.getAllPieces(BLACK):
+        #     #         if self.black_count > self.red_count:
+        #     #             score += util.manhattanDistance((posR.x,posR.y), (pos.x, pos.y))
+        #     #         if self.red_count > self.black_count:
+        #     #             score -= util.manhattanDistance((posR.x, posR.y),(pos.x, pos.y))
+
+     
+        # for piece in self.getAllPieces(RED):
+        #     if piece.king:
+        #         score += 2
+        #     score += 5+(7-piece.y)
+        # for piece in self.getAllPieces(BLACK):
+        #     if piece.king:
+        #         score -= 2
+        #     score -= (5+piece.y)
+
+
+        # revised eval function according to paper I found 
+
         if self.num_plys == 0:
             score = random.randint(-12, 12)
             return score 
-        if self.num_plys > 20:
-            score += 2*(self.red_count - self.black_count)
-            for posR in self.getAllPieces(RED):
-                for pos in self.getAllPieces(BLACK):
-                    if self.black_count > self.red_count:
-                        score += util.manhattanDistance((posR.x,posR.y), (pos.x, pos.y))
-                    if self.red_count > self.black_count:
-                        score -= util.manhattanDistance((posR.x, posR.y),(pos.x, pos.y))
-                    score /= abs(self.red_count - self.black_count)+.01
-            return score
 
-        if len(self.getAllPieces(RED)) + len(self.getAllPieces(BLACK)) < 15:
-            score += 1.5*(self.red_count - self.black_count)
+        # increase score according to factors of red player (maximizing player):
+        
+        score += 5*self.red_pawns
+        score += 7.75 * self.red_kings
+        score += 4 * self.red_back
+        score += 2.5 * self.red_mid
+        score += 0.5 * self.red_outsidemid
+        score -= 3* self.red_vuln
 
-            # incorporate factor that scores positions based on overall distance to other pieces; 
-            # 
-            # for posR in self.getAllPieces(RED):
-            #     for pos in self.getAllPieces(BLACK):
-            #         if self.black_count > self.red_count:
-            #             score += util.manhattanDistance((posR.x,posR.y), (pos.x, pos.y))
-            #         if self.red_count > self.black_count:
-            #             score -= util.manhattanDistance((posR.x, posR.y),(pos.x, pos.y))
-
-     
-        for piece in self.getAllPieces(RED):
-            if piece.king:
-                score += 2
-            score += 5+(7-piece.y)
-        for piece in self.getAllPieces(BLACK):
-            if piece.king:
-                score -= 2
-            score -= (5+piece.y)
+        # decrease score according to factors of black player (minimizing player):
+        score -= 5*self.black_pawns
+        score -= 7.75 * self.black_kings
+        score -= 4 * self.black_back
+        score -= 2.5 * self.black_mid
+        score -= 0.5 * self.black_outsidemid
+        score += 3 * self.black_vuln
 
         return score 
     
