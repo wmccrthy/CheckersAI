@@ -2,8 +2,7 @@ import pygame as pg
 import random
 import sys
 from itertools import cycle
-import minimax
-import util
+
 
 pg.init()
 clock = pg.time.Clock()

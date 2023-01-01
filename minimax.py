@@ -1,7 +1,6 @@
 import pygame as pg 
 import board as Board
 from copy import deepcopy
-import util
 import random
 import transposition
 RED = (250,0,0)
