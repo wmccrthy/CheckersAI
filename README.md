@@ -12,7 +12,7 @@ Board.py contains:
  minimax.py contains: 
   - the primary and accessory functions that implement the minimax and expectimax algorithms with presorting, alpha-beta pruning and transposition tables.
   
- zobrist.py contains:
+transposition.py contains:
   - the functions used to implement an augmented form of zobrist hashing, used for the implementation of transposition tables within the minimax algorithm. 
   
   
